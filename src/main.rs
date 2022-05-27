@@ -28,6 +28,10 @@ fn binary_int_operation<Op>(stack: &mut [u8], stack_size: &mut usize, op: Op) ->
     result
 }
 
+fn bytecode_imul(stack: &mut [u8], stack_size: &mut usize) -> u32 {
+    binary_int_operation(stack, stack_size, |a, b| a * b)
+}
+
 fn bytecode_iadd(stack: &mut [u8], stack_size: &mut usize) -> u32 {
     binary_int_operation(stack, stack_size, |a, b| a + b)
 }
@@ -49,5 +53,8 @@ pub(crate) fn main() {
     let sum = bytecode_iadd(&mut stack, &mut stack_size);
     println!("[0] {} [1] {} [2] {} [3] {}", stack[0], stack[1], stack[2], stack[3]);
     println!("soma {}", sum);
+    bytecode_bipush(&mut stack, 2, &mut stack_size);
+    let mul = bytecode_imul(&mut stack, &mut stack_size);
+    println!("mul {}", mul);
     println!("Hello, world!");
 }
