@@ -1,33 +1,32 @@
-fn get_topmost_int(stack: &mut Vec<u8>, stack_size: &mut usize) -> u32 {
+fn get_topmost_int(stack: &mut [u8], stack_size: &mut usize) -> u32 {
     let base_stack = *stack_size - 4;
     *stack_size = base_stack;
-    return ((stack[base_stack] as u32) * 0x1000000 + (stack[base_stack + 1] as u32) * 0x10000 +
-            (stack[base_stack + 2] as u32) *0x100 + (stack[base_stack + 3] as u32)).into();
+    
+    (stack[base_stack] as u32) * 0x1000000 + (stack[base_stack + 1] as u32) * 0x10000 +
+            (stack[base_stack + 2] as u32) *0x100 + (stack[base_stack + 3] as u32)
 }
 
-fn push_int(stack: &mut Vec<u8>, data_to_push: u32, stack_size: &mut usize) {
+fn push_int(stack: &mut [u8], data_to_push: u32, stack_size: &mut usize) {
     let data_bytes = data_to_push.to_be_bytes();
     let start = *stack_size;
 
-    for i in 0..data_bytes.len() {
-        stack[i + start] = data_bytes[i];
-    }
+    stack[start..(data_bytes.len() + start)].copy_from_slice(&data_bytes[..]);
     *stack_size += data_bytes.len();
 }
 
-fn bytecode_bipush(stack: &mut Vec<u8>, data_to_push: u8, stack_size: &mut usize) {
+fn bytecode_bipush(stack: &mut [u8], data_to_push: u8, stack_size: &mut usize) {
     push_int(stack, data_to_push.into(), stack_size);
 }
 
-fn bytecode_iadd(stack: &mut Vec<u8>, stack_size: &mut usize) -> u32 {
+fn bytecode_iadd(stack: &mut [u8], stack_size: &mut usize) -> u32 {
     let sum = get_topmost_int(stack, stack_size) + get_topmost_int(stack, stack_size);
     push_int(stack, sum, stack_size);
-    return sum;
+    sum
 }
 
 pub(crate) fn main() {
-    let bytecode: Vec<u8> = vec![1, 2, 3];
-    let mut stack: Vec<u8> = vec![0; 64];
+    let bytecode: [u8; 64] = [0; 64];
+    let mut stack = [0; 64];
     let mut stack_size: usize = 0;
 
     println!("{}", bytecode[0]);
