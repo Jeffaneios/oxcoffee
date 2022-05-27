@@ -18,10 +18,18 @@ fn bytecode_bipush(stack: &mut [u8], data_to_push: u8, stack_size: &mut usize) {
     push_int(stack, data_to_push.into(), stack_size);
 }
 
+fn binary_int_operation<Op>(stack: &mut [u8], stack_size: &mut usize, op: Op) -> u32 
+        where
+        Op: Fn(u32, u32) -> u32 {
+    
+
+    let result = op(get_topmost_int(stack, stack_size), get_topmost_int(stack, stack_size));
+    push_int(stack, result, stack_size);
+    result
+}
+
 fn bytecode_iadd(stack: &mut [u8], stack_size: &mut usize) -> u32 {
-    let sum = get_topmost_int(stack, stack_size) + get_topmost_int(stack, stack_size);
-    push_int(stack, sum, stack_size);
-    sum
+    binary_int_operation(stack, stack_size, |a, b| a + b)
 }
 
 pub(crate) fn main() {
